@@ -1,0 +1,91 @@
+.homepage {
+  display: flex;
+  flex-direction: row;
+  /* margin-top: 0; */
+  top: 0;
+  left: 0;
+  bottom: 0;
+  position: absolute;
+}
+
+.leftContainer {
+  display: flex;
+  width: 75vw;
+  height: 100vh;
+  justify-content: center;
+  background-color: grey;
+}
+/* #dwtcontrolContainer {
+  position: absolute;
+  left: 0;
+  height: 100vh;
+  display: flex;
+  flex-direction: row;
+} */
+.rightContainer {
+  width: 25vw;
+  height: 100vh;
+  justify-content: center;
+  background-color: rgb(194, 190, 190);
+  /* position: absolute; */
+  top: 0;
+}
+.selectSource {
+  display: flex;
+  font-size: x-large;
+  margin-left: 1.5rem;
+}
+.selectInput {
+  display: flex;
+  padding: 5px;
+  margin-bottom: 10px;
+  margin-left: 1.5rem;
+}
+.checkBox {
+  display: flex;
+  justify-content: space-evenly;
+  margin: 10px;
+}
+.radio label {
+  margin-left: 1.5rem;
+}
+.radioButton {
+  margin-left: 80px;
+  margin-bottom: 10px;
+}
+.resolution-container {
+  margin-bottom: 10px;
+}
+.resolution-container label {
+  margin-left: 1.5rem;
+}
+.button-group {
+  margin: 10px 25px;
+}
+.button-group button {
+  margin: 2px;
+  height: 25px;
+  transition: transform 0.5s;
+  border-radius: 5px;
+}
+.button-group button:hover {
+  transform: scale(1.1);
+}
+.button-group input {
+  margin: 2px;
+  height: 25px;
+  background-color: coral;
+  width: 100px;
+  border-radius: 5px;
+  transition: transform 0.5s;
+}
+.button-group input:hover {
+  transform: scale(1.1);
+}
+
+@media only screen and (max-width: "750px") {
+  .homepage {
+    display: flex;
+    flex-direction: column;
+  }
+}

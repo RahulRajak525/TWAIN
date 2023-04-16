@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="Resources/dynamsoft.webtwain.initiate.js"></script>
+    <script src="Resources/dynamsoft.webtwain.config.js"></script>
+  </head>
+  <link rel="stylesheet" href="twain.css" />
+  <body>
+    <div class="homepage">
+      <div class="leftContainer">
+        <div id="dwtcontrolContainer"></div>
+      </div>
+      <div class="rightContainer">
+        <div class="selectSource">Select Source :</div>
+        <div>
+          <select class="selectInput" onchange="source_onchange()">
+            <option value="0">TWAIN2 FreeImage Software Scanner</option>
+            <option value="1">Twain64-TWAIN2 FreeImage Software Scanner</option>
+          </select>
+        </div>
+        <div class="checkBox">
+          <div>
+            <input type="checkbox" />
+            <label>Show UI</label>
+          </div>
+          <div>
+            <input type="checkbox" />
+            <label>AutoFeeder</label>
+          </div>
+        </div>
+
+        <div class="radio">
+          <label>Pixel Type :</label>
+
+          <div class="radioButton">
+            <form>
+              <label for="b&c">
+                <input type="radio" id="b&w" value="Blackandwhite" /> Black and
+                white
+              </label>
+              <br />
+              <label for="Grey">
+                <input type="radio" id="grey" value="Grey" /> Grey
+              </label>
+              <br />
+              <label>
+                <input type="radio" id="color" value="Color" /> Color</label
+              >
+            </form>
+          </div>
+        </div>
+        <div class="resolution-container">
+          <label>Resolution : </label>
+          <select style="width: 150px; height: 25px">
+            <option value="50">50</option>
+            <option value="100">100</option>
+            <option value="200" selected>200</option>
+            <option value="300">300</option>
+            <option value="400">400</option>
+            <option value="500">500</option>
+            <option value="600">600</option>
+          </select>
+        </div>
+        <div class="button-group">
+          <div>
+            <button onclick="SaveAllAsPDF()">Scan and Save 1</button>
+          </div>
+          <div>
+            <button onclick="saveAsJPEG()">Scan and Save 2</button>
+          </div>
+          <div>
+            <button>Remove Blank Images</button>
+          </div>
+          <div>
+            <button class="remove-all-btn" onclick="removeAllImages()">
+              Remove All Images
+            </button>
+          </div>
+          <div>
+            <input type="button" value="SCAN" onclick="AcquireImage()" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+      var DWObject;
+
+      function Dynamsoft_OnReady() {
+        DWObject = Dynamsoft.DWT.GetWebTwain("dwtcontrolContainer");
+        var thumbnailViewerSettings = {
+          location: "left",
+          size: "40%",
+          columns: 2,
+          rows: 3,
+          scrollDirection: "vertical",
+          pageMargin: 10,
+          background: "rgb(255, 255, 255)",
+          border: "",
+          Heigth: "50%",
+          allowKeyboardControl: true,
+          allowPageDragging: true,
+          allowResizing: false,
+          showPageNumber: false,
+          pageBackground: "transparent",
+          pageBorder: "1px solid rgb(238, 238, 238)",
+          hoverBackground: "rgb(239, 246, 253)",
+          hoverPageBorder: "1px solid rgb(238, 238, 238)",
+          placeholderBackground: "rgb(251, 236, 136)",
+          selectedPageBorder: "1px solid rgb(125,162,206)",
+          selectedPageBackground: "rgb(199, 222, 252)",
+        };
+
+        var thumbnail = DWObject.Viewer.createThumbnailViewer(
+          thumbnailViewerSettings
+        );
+        thumbnail.show();
+        var objThumbnailViewer = DWObject.Viewer.createThumbnailViewer();
+        objThumbnailViewer.background = "rgb(0,0,255)";
+        objThumbnailViewer.show();
+      }
+
+      function AcquireImage() {
+        if (DWObject) {
+          DWObject.SelectSourceAsync()
+            .then(function () {
+              return DWObject.AcquireImageAsync({
+                IfDisableSourceAfterAcquire: true,
+              });
+            })
+            .then(function (result) {
+              console.log(result);
+            })
+            .catch(function (exp) {
+              console.error(exp.message);
+            })
+            .finally(function () {
+              DWObject.CloseSourceAsync().catch(function (e) {
+                console.error(e);
+              });
+            });
+        }
+      }
+      function removeAllImages() {
+        if (DWObject) {
+          DWObject.RemoveAllImages();
+        }
+      }
+
+      function SaveAllAsPDF() {
+        DWObject.IfShowFileDialog = false;
+        DWObject.SaveAllAsPDF(
+          "D:\Result.pdf",
+          function () {
+            console.log("Successful!");
+          },
+          function (errCode, errString) {
+            console.log(errString);
+          }
+        );
+      }
+
+      function saveAsJPEG() {
+        DWObject.RegisterEvent(
+          "OnGetFilePath",
+          (isSave, filesCount, index, directory, _fn) => {
+            if (directory === "" && _fn === "") {
+              console.log("User cancelled the operation.");
+            } else {
+              var path = directory + "\\" + _fn.substr(0, _fn.lastIndexOf("."));
+              DWObject.IfShowFileDialog = false;
+              for (var i = 1; i < DWObject.HowManyImagesInBuffer; i++) {
+                DWObject.SaveAsJPEG(
+                  path + "-" + i.toString() + ".jpg",
+                  i,
+                  function () {
+                    console.log("Successful!");
+                  },
+                  function (errCode, errString) {
+                    console.log(errString);
+                  }
+                );
+              }
+            }
+          }
+        );
+        DWObject.IfShowFileDialog = true;
+        DWObject.SaveAsJPEG(
+          "Sample.jpg",
+          0,
+          function () {
+            console.log("Successful!");
+          },
+          function (errCode, errString) {
+            console.log(errString);
+          }
+        );
+      }
+    </script>
+  </body>
+</html>
